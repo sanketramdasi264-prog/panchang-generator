@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>आजचा पंचांग — Generator</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&family=Baloo+2:wght@700&display=swap" rel="stylesheet">
+
+<style>
+    body { font-family:'Noto Sans Devanagari', sans-serif; background:#f3f3e8; margin:0; padding:20px; }
+    .wrap { max-width:900px; margin:auto; background:#fff; padding:20px; border-radius:14px; box-shadow:0 5px 20px rgba(0,0,0,0.1); }
+
+    label { font-weight:600; margin-top:10px; display:block; }
+    input, select {
+        width:100%; padding:12px; margin-top:6px;
+        border:1px solid #ccc; border-radius:8px; font-size:16px;
+    }
+
+    #preview {
+        width:100%; margin-top:20px; border-radius:10px; border:1px solid #ddd;
+    }
+
+    button {
+        padding:12px 20px; border:0; font-size:16px;
+        color:#fff; border-radius:8px; cursor:pointer;
+    }
+    #generateBtn { background:#0b4a6f; width:100%; margin-top:16px; }
+    #downloadBtn { background:#d97706; width:100%; margin-top:10px; }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+    <h2 style="font-family:'Baloo 2'; margin:0;">
+        आजचा पंचांग — Card Generator
+    </h2>
+
+    <label>शहर</label>
+    <select id="city">
+        <option>Mumbai</option>
+        <option>Pune</option>
+        <option>Nagpur</option>
+        <option>Aurangabad</option>
+    </select>
+
+    <label>दिनांक</label>
+    <input type="date" id="dateInput">
+
+    <label>नाव</label>
+    <input id="username" placeholder="उदा. संकेत रामदासी">
+
+    <label>संपर्क</label>
+    <input id="mobile" placeholder="उदा. 98XXXXXXXX">
+
+    <label>फोटो (ऐच्छिक)</label>
+    <input type="file" id="userPhoto" accept="image/*">
+
+    <button id="generateBtn">Generate Panchang Preview</button>
+    <button id="downloadBtn">Download Panchang</button>
+
+    <canvas id="canvas" width="1080" height="1316" style="display:none"></canvas>
+    <img id="preview">
+</div>
+<script>
+const $ = id => document.getElementById(id);
+
+function today() {
+    let d = new Date();
+    let m = String(d.getMonth()+1).padStart(2,'0');
+    let x = String(d.getDate()).padStart(2,'0');
+    return `${d.getFullYear()}-${m}-${x}`;
+}
+$("dateInput").value = today();
+
+let userImg = null;
+$("userPhoto").addEventListener("change", e=>{
+    let f = e.target.files[0];
+    if(!f){ userImg=null; return; }
+    let r = new FileReader();
+    r.onload = () => userImg = r.result;
+    r.readAsDataURL(f);
+});
+
+// Panchang sample (safe placeholders)
+function panchang(d, city){
+    const T = ['प्रतिपदा','द्वितीया','तृतीया','चतुर्थी','पंचमी','षष्ठी','सप्तमी','अष्टमी','नवमी','दशमी','एकादशी','द्वादशी','त्रयोदशी','चतुर्दशी'];
+    const N = ['रोहिणी','हस्त','चित्रा','स्वाति','विशाखा','अनुराधा','ज्येष्ठा','मूळ','पूर्वाषाढा','उत्तराषाढा','श्रवण','शतभिषा'];
+
+    let dt = new Date(d);
+    let i = dt.getDate() % T.length;
+
+    return {
+        tithi: T[i],
+        tithi_end: "रात्रौ १०:१५",
+        nak: N[i],
+        nak_end: "दुपारी ३:४०",
+        yog: "प्रीति",
+        kar: "कौलव",
+        suryoday: "०६:४७",
+        suryasth: "०६:०७",
+        chandra: "वृषभ",
+        surya: "वृश्चिक",
+        guru: "वृषभ",
+        rahu: "०७:३० – ०९:००",
+        weekday: dt.toLocaleDateString('mr-IN',{ weekday:'long'})
+    };
+}
+
+function draw(){
+    const city = $("city").value;
+    const date = $("dateInput").value;
+    const name = $("username").value;
+    const mobile = $("mobile").value;
+
+    const p = panchang(date, city);
+
+    const c = $("canvas");
+    const ctx = c.getContext("2d");
+
+    ctx.fillStyle="#fff";
+    ctx.fillRect(0,0,c.width,c.height);
+
+    // Header
+    ctx.fillStyle="#0b4a6f";
+    ctx.fillRect(0,0,c.width,150);
+
+    ctx.fillStyle="#fff";
+    ctx.font="bold 60px Baloo 2";
+    ctx.fillText("आजचा पंचांग", 40, 95);
+
+    // Date line
+    ctx.font="28px Noto Sans Devanagari";
+    ctx.fillText(`${p.weekday}, ${date}`, 40, 145);
+
+    // Main block bg
+    ctx.fillStyle="#f9f7f1";
+    ctx.fillRect(40,180, c.width-80, 720);
+
+    ctx.fillStyle="#000";
+    ctx.font="34px Noto Sans Devanagari";
+
+    let y = 240;
+    const L = 70;
+
+    ctx.fillText(`तिथी: ${p.tithi} (${p.tithi_end})`, 70, y); y+=L;
+    ctx.fillText(`वार: ${p.weekday}`, 70, y); y+=L;
+    ctx.fillText(`नक्षत्र: ${p.nak} (${p.nak_end})`, 70, y); y+=L;
+    ctx.fillText(`योग: ${p.yog}`, 70, y); y+=L;
+    ctx.fillText(`करण: ${p.kar}`, 70, y); y+=L;
+    ctx.fillText(`सूर्योदय: ${p.suryoday}   सूर्यास्त: ${p.suryasth}`, 70, y); y+=L;
+    ctx.fillText(`चंद्रराशी: ${p.chandra}`, 70, y); y+=L;
+    ctx.fillText(`सूर्यराशी: ${p.surya}`, 70, y); y+=L;
+    ctx.fillText(`गुरुराशी: ${p.guru}`, 70, y); y+=L;
+    ctx.fillText(`राहुकाल: ${p.rahu}`, 70, y); y+=L;
+
+    // Footer strip
+    ctx.fillStyle="#0b4a6f";
+    ctx.fillRect(0, 940, c.width, 200);
+
+    ctx.fillStyle="#fff";
+    ctx.font="bold 38px Noto Sans Devanagari";
+    ctx.fillText(name, 50, 1010);
+
+    ctx.font="26px Noto Sans Devanagari";
+    ctx.fillText(`संपर्क: ${mobile}`, 50, 1060);
+
+    if(userImg){
+        let img = new Image();
+        img.onload = ()=>{
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(c.width-150, 1030, 70, 0, Math.PI*2);
+            ctx.clip();
+            ctx.drawImage(img, c.width-220, 960, 140, 140);
+            ctx.restore();
+            $("preview").src = c.toDataURL();
+        };
+        img.src = userImg;
+    } else {
+        $("preview").src = c.toDataURL();
+    }
+}
+
+// Buttons
+$("generateBtn").onclick = draw;
+$("downloadBtn").onclick = ()=>{
+    const a = document.createElement("a");
+    a.href = $("canvas").toDataURL("image/png");
+    a.download = "panchang.png";
+    a.click();
+};
+
+// auto generate
+setTimeout(draw, 400);
+</script>
+</body>
+</html>
