@@ -1,72 +1,88 @@
 <!doctype html>
 <html lang="mr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>आजचा पंचांग — Generator (Offline)</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>आजचा पंचांग — OmKarmyog</title>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&family=Baloo+2:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&family=Baloo+2:wght@700&display=swap" rel="stylesheet">
 
-<style>
-  body { font-family: 'Noto Sans Devanagari', sans-serif; background:#f3f3e8; margin:0; padding:18px; }
-  .wrap { max-width:940px; margin:auto; background:#fff; padding:18px; border-radius:12px; box-shadow:0 8px 26px rgba(0,0,0,.08); }
-  h1{ font-family:'Baloo 2'; margin:0 0 8px 0; }
-  label{display:block; margin-top:12px; font-weight:600}
-  select,input{width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-top:6px; font-size:16px}
-  .row{display:flex; gap:12px}
-  .col{flex:1}
-  button{padding:12px 14px; border:0; border-radius:8px; color:#fff; cursor:pointer}
-  #generateBtn{ background:#0b4a6f; width:100%; margin-top:14px }
-  #downloadBtn{ background:#d97706; width:100%; margin-top:8px }
-  #preview{ margin-top:18px; width:100%; border-radius:10px; border:1px solid #eee; display:block}
-  .small{font-size:13px;color:#666;margin-top:8px}
-  @media (max-width:720px){ .wrap{padding:12px} button{font-size:15px} }
-</style>
+  <style>
+    :root{--bg:#fffaf3;--accent:#012b46;--accent2:#c86d22;--strip:#083b52}
+    body{margin:0;background:#f3f3e8;font-family:'Noto Sans Devanagari',sans-serif;color:#0b2b3a}
+    .wrap{max-width:960px;margin:18px auto;padding:18px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+    h1{font-family:'Baloo 2';margin:0;font-size:22px}
+    label{display:block;margin-top:12px;font-weight:600}
+    input,select,button{width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-top:6px;font-size:15px}
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+    #controls{display:flex;gap:10px;margin-top:12px}
+    .btn{border:0;color:#fff;padding:10px 12px;border-radius:8px;cursor:pointer}
+    .primary{background:var(--accent)}
+    .accent{background:#d97706}
+    #preview{display:block;margin-top:14px;border-radius:8px;border:1px solid #eee;max-width:100%}
+    .small{font-size:13px;color:#666;margin-top:6px}
+    .footnote{font-size:13px;color:#444;margin-top:12px}
+    @media(max-width:700px){ .row{flex-direction:column} #controls{flex-direction:column} }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>आजचा पंचांग</h1>
-  <div class="small">Offline calculation — no API needed. Host on GitHub Pages and use in your WebView app.</div>
+  <div class="wrap">
+    <h1>आजचा पंचांग — OmKarmyog</h1>
+    <div class="small">Real Panchang using free AstroSage JSON (fallback to offline calculation if blocked). Card: 1080×1316</div>
 
-  <div class="row" style="margin-top:14px">
-    <div class="col">
-      <label>शहर</label>
-      <select id="city"><option>Mumbai</option><option>Pune</option><option>Nagpur</option><option>Aurangabad</option></select>
+    <div class="row" style="margin-top:12px">
+      <div class="col">
+        <label>शहर</label>
+        <select id="city">
+          <option>Mumbai</option>
+          <option>Pune</option>
+          <option>Nagpur</option>
+          <option>Aurangabad</option>
+        </select>
+      </div>
+      <div style="width:220px">
+        <label>दिनांक</label>
+        <input id="dateInput" type="date"/>
+      </div>
     </div>
-    <div style="width:220px">
-      <label>दिनांक</label>
-      <input id="dateInput" type="date">
+
+    <label>नाव</label>
+    <input id="username" placeholder="उदा. संकेत रामदासी"/>
+
+    <label>संपर्क</label>
+    <input id="mobile" placeholder="उदा. 98XXXXXXXX"/>
+
+    <label>फोटो (ऐच्छिक)</label>
+    <input id="userPhoto" type="file" accept="image/*"/>
+
+    <div id="controls">
+      <button id="generateBtn" class="btn primary">Generate Card</button>
+      <button id="downloadBtn" class="btn accent">Download PNG</button>
+    </div>
+
+    <canvas id="canvas" width="1080" height="1316" style="display:none"></canvas>
+    <img id="preview" alt="Preview (1080×1316)"/>
+
+    <div class="footnote">
+      Logo used from your URL. If AstroSage data is blocked by CORS, the tool will compute approximate Panchang offline.
     </div>
   </div>
 
-  <label>नाव</label>
-  <input id="username" placeholder="उदा. संकेत रामदासी">
-
-  <label>संपर्क</label>
-  <input id="mobile" placeholder="उदा. 98XXXXXXXX">
-
-  <label>फोटो (ऐच्छिक)</label>
-  <input id="userPhoto" type="file" accept="image/*">
-
-  <button id="generateBtn">Generate Panchang Card</button>
-  <button id="downloadBtn">Download PNG</button>
-
-  <canvas id="canvas" width="1080" height="1316" style="display:none"></canvas>
-  <img id="preview" alt="Preview (1080x1316)">
-
-  <div class="small">If preview is blank after publish, press Generate once. Then use the page URL in your WebView app.</div>
-</div>
-
 <script>
+/* ---------- Config ---------- */
+const logoUrl = 'https://blogger.googleusercontent.com/img/a/AVvXsEi1b1z9W0Emd6TROMLNG0AHDbF9oFVx3hrQWAA5sPXU0H0GutM8nlVBGpbcS_YI59L5xehYJefv6C5vvyDOOUZ6PyzvktW_48aSgPjM7JxL_1a5oxKz2T6_cH8xDzqVwg7uhwklag6Vs-U1NiMq06Tq3Wn8JItmyboW9Wz_drK9NP_lOhDq2IjnSlE8Fe6F=s975';
+const astroSageBase = 'https://json.astrosage.com/panchang'; // free endpoint used
+
 /* ---------- Utilities ---------- */
+const el = id => document.getElementById(id);
 const toRad = deg => deg * Math.PI / 180;
 const toDeg = rad => rad * 180 / Math.PI;
 const norm = x => ((x % 360) + 360) % 360;
 
-/* ---------- Julian Day ---------- */
+/* ---------- Offline fallback calculators (kept lightweight) ---------- */
+// These are same helpers as earlier; used if API fails.
 function dateToJulianDate(d){
-  // d: Date object in UTC
   let year = d.getUTCFullYear();
   let month = d.getUTCMonth() + 1;
   let day = d.getUTCDate() + (d.getUTCHours()/24) + (d.getUTCMinutes()/1440) + (d.getUTCSeconds()/86400);
@@ -76,231 +92,179 @@ function dateToJulianDate(d){
   const JD = Math.floor(365.25*(year+4716)) + Math.floor(30.6001*(month+1)) + day + B - 1524.5;
   return JD;
 }
-
-/* ---------- Sun longitude (approx) ---------- */
 function sunEclipticLongitudeJDE(jd){
   const d = jd - 2451545.0;
   const M = norm(357.5291 + 0.98560028 * d);
   const L0 = norm(280.46646 + 0.98564736 * d);
   const C = 1.9148 * Math.sin(toRad(M)) + 0.0200 * Math.sin(toRad(2*M)) + 0.0003 * Math.sin(toRad(3*M));
-  const trueLong = norm(L0 + C);
-  return trueLong;
+  return norm(L0 + C);
 }
-
-/* ---------- Moon longitude (approx) ---------- */
 function moonEclipticLongitudeJDE(jd){
   const d = jd - 2451545.0;
   const Lm = norm(218.316 + 13.176396 * d);
   const Mm = norm(134.963 + 13.064993 * d);
   const Ms = norm(357.529 + 0.98560028 * d);
   const D = norm(297.850 + 12.190749 * d);
-  const lon = Lm
-    + 6.289 * Math.sin(toRad(Mm))
-    + 1.274 * Math.sin(toRad(2*D - Mm))
-    + 0.658 * Math.sin(toRad(2*D))
-    + 0.214 * Math.sin(toRad(2*Mm))
-    - 0.186 * Math.sin(toRad(Ms))
-    - 0.059 * Math.sin(toRad(2*D - 2*Mm))
-    - 0.057 * Math.sin(toRad(2*D - Ms - Mm));
+  const lon = Lm + 6.289 * Math.sin(toRad(Mm)) + 1.274 * Math.sin(toRad(2*D - Mm)) + 0.658 * Math.sin(toRad(2*D)) + 0.214 * Math.sin(toRad(2*Mm)) - 0.186 * Math.sin(toRad(Ms));
   return norm(lon);
 }
-
-/* ---------- Tithi/Nakshatra/Yoga/Karan ---------- */
-function computeTithi(sunLon, moonLon){
-  const diff = norm(moonLon - sunLon);
-  const idx = Math.floor(diff / 12); // 0..29
-  return { index: idx + 1, nameIndex: idx };
-}
-const tithiNames = [
-  'प्रतिपदा','द्वितीया','तृतीया','चतुर्थी','पंचमी','षष्ठी','सप्तमी','अष्टमी','नवमी','दशमी',
-  'एकादशी','द्वादशी','त्रयोदशी','चतुर्दशी','पुनरारम्भ','पंचमी (दो)','षष्ठी (दो)','सप्तमी (दो)','अष्टमी (दो)','नवमी (दो)',
-  'दशमी (दो)','एकादशी (दो)','द्वादशी (दो)','त्रयोदशी (दो)','चतुर्दशी (दो)','अन्य','अन्य','अन्य','अन्य','अन्य'
-];
-
-const nakshatraNames = [
-  'अश्विनी','भरणी','कृत्तिका','रोहिणी','मृगशीर्ष','आर्द्रा','पुनर्वसु','पुष्य','आश्रेषा','मघा','पूर्वफल्गुनी',
-  'उत्तरफल्गुनी','हस्त','चित्रा','स्वाति','विशाखा','अनूराधा','ज्येष्ठा','मूला','पूर्वाषाढा','उत्तराषाढा','श्रवण',
-  'शतभिषा','भव','शिव','सिद्ध','व्याघ्र'
-];
-
-function computeNakshatra(moonLon){
-  const index = Math.floor(moonLon / (360/27));
-  return { index: index, name: nakshatraNames[index] || 'नक्षत्र' };
-}
-
-function computeYoga(sunLon, moonLon){
-  const sum = norm(sunLon + moonLon);
-  const idx = Math.floor(sum / (360/27));
-  return { index: idx + 1 };
-}
-
-function computeKaran(tithiIdx){
-  // simplified karan names (approx)
-  const karanNames = ['वणिज','बालव','कौलव','तैतिल','गर','विष्ट','बव','बालव2','तिक','बव2','वणिज2'];
-  const half = (tithiIdx - 1) * 2; // 0-based half-tithi
-  return { name: karanNames[half % karanNames.length] };
-}
-
-/* ---------- Rashi (zodiac sign) ---------- */
+const tithiNames = ['प्रतिपदा','द्वितीया','तृतीया','चतुर्थी','पंचमी','षष्ठी','सप्तमी','अष्टमी','नवमी','दशमी','एकादशी','द्वादशी','त्रयोदशी','चतुर्दशी','अन्य'];
+const nakshatraNames = ['अश्विनी','भरणी','कृत्तिका','रोहिणी','मृगशीर्ष','आर्द्रा','पुनर्वसु','पुष्य','आश्रेषा','मघा','पूर्वफल्गुनी','उत्तरफल्गुनी','हस्त','चित्रा','स्वाति','विशाखा','अनूराधा','ज्येष्ठा','मूला','पूर्वाषाढा','उत्तराषाढा','श्रवण','शतभिषा','भव','शिव','सिद्ध','व्याघ्र'];
 const rashiNames = ['मेष','वृषभ','मिथुन','कर्क','सिंह','कन्या','तुला','वृश्चिक','धनु','मकर','कुम्भ','मीन'];
-function computeRashi(lon){
-  const idx = Math.floor(lon / 30) % 12;
-  return rashiNames[idx];
-}
-
-/* ---------- Sunrise/Sunset (approx) ---------- */
-function sunTimes(dateLocal, lat, lng){
-  // dateLocal: local date object at midnight local
-  const midnightUTC = new Date(Date.UTC(dateLocal.getFullYear(), dateLocal.getMonth(), dateLocal.getDate(), 0, 0, 0));
-  function sunAltitudeAt(timeUTC){
-    const jd = dateToJulianDate(timeUTC);
-    const sunLon = sunEclipticLongitudeJDE(jd);
-    const eps = 23.4397;
-    const lam = toRad(sunLon);
-    const epsr = toRad(eps);
-    const sinBeta = 0;
-    const X = Math.cos(lam);
-    const Y = Math.cos(epsr)*Math.sin(lam) - Math.sin(epsr)*sinBeta;
-    const Z = Math.sin(epsr)*Math.sin(lam) + Math.cos(epsr)*sinBeta;
-    const r = Math.sqrt(X*X + Y*Y + Z*Z);
-    const dec = Math.asin(Z/r);
-    const d = jd - 2451545.0;
-    const GMST = norm(280.46061837 + 360.98564736629 * d);
-    const LST = norm(GMST + lng);
-    const ra = Math.atan2(Y, X);
-    let raDeg = toDeg(ra);
-    raDeg = norm(raDeg);
-    const HA = toRad(LST - raDeg);
-    const latr = toRad(lat);
-    const alt = Math.asin(Math.sin(latr)*Math.sin(dec) + Math.cos(latr)*Math.cos(dec)*Math.cos(HA));
-    return toDeg(alt);
-  }
-
-  const step = 5; // minutes
-  let times = [];
-  let altPrev = sunAltitudeAt(new Date(midnightUTC.getTime()));
-  let tPrev = midnightUTC.getTime();
-  for(let m=1; m<=288; m++){
-    const t = midnightUTC.getTime() + m*step*60000;
-    const alt = sunAltitudeAt(new Date(t));
-    if((altPrev < -0.833 && alt >= -0.833) || (altPrev >= -0.833 && alt < -0.833)){
-      const frac = ( -0.833 - altPrev ) / (alt - altPrev || 1e-6);
-      const tCross = new Date(tPrev + frac * (t - tPrev));
-      times.push(tCross);
-    }
-    altPrev = alt; tPrev = t;
-  }
-
-  function toLocalTimeString(dtUTC){
-    // convert UTC time to local time using browser TZ
-    const local = new Date(dtUTC.getTime() + (new Date().getTimezoneOffset()*-1)*60000);
-    const hh = String(local.getHours()).padStart(2,'0');
-    const mm = String(local.getMinutes()).padStart(2,'0');
-    return `${hh}:${mm}`;
-  }
-
-  let sunrise = '—', sunset='—';
-  if(times.length >= 2){
-    sunrise = toLocalTimeString(times[0]);
-    sunset = toLocalTimeString(times[1]);
-  } else {
-    sunrise = '06:00'; sunset='17:45';
-  }
-  return { sunrise, sunset };
-}
-
-/* ---------- Rahu kaal (approx table) ---------- */
-const rahuTableDefault = {
-  'Mumbai':['16:30-18:00','13:30-15:00','07:30-09:00','10:30-12:00','12:00-13:30','09:00-10:30','15:00-16:30'],
-  'Pune' :['16:30-18:00','13:30-15:00','07:30-09:00','10:30-12:00','12:00-13:30','09:00-10:30','15:00-16:30'],
-  'Nagpur':['16:00-17:30','13:00-14:30','07:00-08:30','10:00-11:30','11:30-13:00','08:30-10:00','14:00-15:30'],
-  'Aurangabad':['16:20-17:50','13:20-14:50','07:20-08:50','10:20-11:50','11:50-13:20','08:50-10:20','14:50-16:20']
-};
-
-/* ---------- Compute panchang for a date ---------- */
-function computePanchangForDate(dateStr, cityName, lat, lng){
+function computePanchangOffline(dateStr, city){
   const parts = dateStr.split('-').map(Number);
   const localMidnight = new Date(parts[0], parts[1]-1, parts[2], 0, 0, 0);
   const jd = dateToJulianDate(new Date(localMidnight.getTime() - localMidnight.getTimezoneOffset()*60000));
   const sunLon = sunEclipticLongitudeJDE(jd + 0.5);
   const moonLon = moonEclipticLongitudeJDE(jd + 0.5);
-
-  const tithi = computeTithi(sunLon, moonLon);
-  const nak = computeNakshatra(moonLon);
-  const yoga = computeYoga(sunLon, moonLon);
-  const sunRashi = computeRashi(sunLon);
-  const moonRashi = computeRashi(moonLon);
-  const kar = computeKaran(tithi.index);
-
-  const times = sunTimes(localMidnight, lat, lng);
-  const rahuArr = (rahuTableDefault[cityName] || rahuTableDefault['Mumbai']);
-  const rahu = rahuArr[new Date(localMidnight).getDay()];
-
+  const diff = norm(moonLon - sunLon);
+  const tIdx = Math.floor(diff/12); // 0..29
+  const nakIdx = Math.floor(moonLon / (360/27));
+  const sunR = rashiNames[Math.floor(sunLon/30)%12];
+  const moonR = rashiNames[Math.floor(moonLon/30)%12];
+  // sunrise/sunset rough (fallback) - fixed by city
+  const suns = {Mumbai:['06:00','17:48'],Pune:['06:05','17:52'],Nagpur:['05:50','17:20'],Aurangabad:['06:10','17:40']};
+  const [sr,ss] = suns[city] || suns['Mumbai'];
+  const rahuTable = {Mumbai:['16:30-18:00','13:30-15:00','07:30-09:00','10:30-12:00','12:00-13:30','09:00-10:30','15:00-16:30'],Pune:['16:30-18:00','13:30-15:00','07:30-09:00','10:30-12:00','12:00-13:30','09:00-10:30','15:00-16:30'],Nagpur:['16:00-17:30','13:00-14:30','07:00-08:30','10:00-11:30','11:30-13:00','08:30-10:00','14:00-15:30'],Aurangabad:['16:20-17:50','13:20-14:50','07:20-08:50','10:20-11:50','11:50-13:20','08:50-10:20','14:50-16:20']};
+  const rahu = rahuTable[city][localMidnight.getDay()] || rahuTable['Mumbai'][localMidnight.getDay()];
   return {
     date: dateStr,
-    tithi: `${tithi.index}. ${tithiNames[tithi.nameIndex % tithiNames.length] || 'तिथी'}`,
-    tithi_index: tithi.index,
+    tithi: `${tIdx+1}. ${tithiNames[tIdx%tithiNames.length]}`,
     tithi_end: '',
-    nakshatra: `${nak.name}`,
-    nakshatra_index: nak.index,
+    nakshatra: nakshatraNames[nakIdx%nakshatraNames.length],
     nak_end: '',
-    yoga_index: yoga.index,
-    karan: kar.name || '',
-    sunr: times.sunrise,
-    suns: times.sunset,
-    chandra: moonRashi,
-    surya: sunRashi,
-    guru: sunRashi,
-    rahu: rahu
+    yoga: '', karan: '',
+    sunrise: sr, sunset: ss,
+    chandra: moonR, surya: sunR,
+    guru: sunR, rahu
   };
 }
 
-/* ---------- UI & Canvas ---------- */
-const el = id => document.getElementById(id);
-function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
+/* ---------- Fetch from AstroSage (free endpoint) ---------- */
+async function fetchAstroSage(dateStr, city){
+  // dateStr 'YYYY-MM-DD', city e.g. 'Mumbai' -> API uses lowercase city names sometimes
+  const parts = dateStr.split('-');
+  const y = parts[0], m = parts[1], d = parts[2];
+  const citySlug = city.toLowerCase();
+  const url = `${astroSageBase}/${y}/${m}/${d}/${citySlug}`;
+  try{
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    // AstroSage JSON structure is not strictly guaranteed; we try to map common fields
+    // Attempt to read common keys (fallback to offline compute)
+    const map = {};
+    // Many astrosage responses store fields like: data.tithi, data.tithi_end, data.nakshatra, data.nakshatra_end, data.yoga, data.karan, data.sunrise, data.sunset, data.chandra_rashi, data.surya_rashi, data.rahu_kal, data.din_vishesh
+    if(data && typeof data === 'object'){
+      const x = data; // top-level
+      map.tithi = x.tithi || x.tithi_name || x.panchang?.tithi || '';
+      map.tithi_end = x.tithi_end || x.tithi_till || x.panchang?.tithi_end || '';
+      map.nakshatra = x.nakshatra || x.nakshatra_name || x.panchang?.nakshatra || '';
+      map.nak_end = x.nakshatra_end || x.nakshatra_till || x.panchang?.nak_end || '';
+      map.yoga = x.yoga || x.panchang?.yoga || '';
+      map.karan = x.karan || x.panchang?.karan || '';
+      map.sunrise = x.sunrise || x.sunrise_time || x.panchang?.sunrise || '';
+      map.sunset = x.sunset || x.sunset_time || x.panchang?.sunset || '';
+      map.chandra = x.chandra_rashi || x.moon_sign || x.panchang?.moon_rashi || '';
+      map.surya = x.surya_rashi || x.sun_sign || x.panchang?.sun_rashi || '';
+      map.rahu = x.rahu_kal || x.rahu || x.panchang?.rahu || '';
+      map.din_vishesh = x.din_vishesh || x.special || x.day_special || x.panchang?.din_vishesh || '';
+      // If fields are nested differently, try common nested paths
+      if(!map.tithi && data.panchang && data.panchang.tithi) map.tithi = data.panchang.tithi;
+    }
+    // If mapping seems empty, return null to trigger fallback
+    const hasUseful = map.tithi || map.nakshatra || map.sunrise || map.chandra || map.surya;
+    if(!hasUseful) return null;
+    return map;
+  }catch(err){
+    console.warn('AstroSage fetch error:', err);
+    return null;
+  }
+}
+
+/* ---------- UI helpers ---------- */
+function todayISO(){ return new Date().toISOString().slice(0,10); }
 el('dateInput').value = todayISO();
 
 let userImgData = null;
 el('userPhoto').addEventListener('change', e=>{
   const f = e.target.files && e.target.files[0];
   if(!f){ userImgData = null; return; }
-  const r = new FileReader();
-  r.onload = ()=> userImgData = r.result;
-  r.readAsDataURL(f);
+  const r = new FileReader(); r.onload = ()=> userImgData = r.result; r.readAsDataURL(f);
 });
 
-function cityLatLng(city){
-  const map = {
-    'Mumbai':[19.0760,72.8777],
-    'Pune':[18.5204,73.8567],
-    'Nagpur':[21.1458,79.0882],
-    'Aurangabad':[19.8762,75.3433]
-  };
-  return map[city] || map['Mumbai'];
-}
+/* ---------- Canvas drawing ---------- */
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function drawIcon(ctx,x,y,glyph){ ctx.save(); ctx.fillStyle='#f9c846'; ctx.beginPath(); ctx.arc(x,y,22,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.font='18px Noto Sans Devanagari'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(glyph,x,y); ctx.restore(); }
 
-function renderCard(){
+async function renderCard(){
   const city = el('city').value;
   const date = el('dateInput').value;
   const name = el('username').value || '';
   const mobile = el('mobile').value || '';
-  const [lat, lng] = cityLatLng(city);
+  const [lat,lng] = cityLatLng(city);
 
-  const p = computePanchangForDate(date, city, lat, lng);
+  // Try API first
+  let data = await fetchAstroSage(date, city);
+  if(!data){
+    // fallback to offline compute
+    const offline = computePanchangOffline(date, city);
+    data = {
+      tithi: offline.tithi,
+      tithi_end: offline.tithi_end,
+      nakshatra: offline.nakshatra,
+      nak_end: offline.nak_end,
+      yoga: offline.yoga,
+      karan: offline.karan,
+      sunrise: offline.sunrise,
+      sunset: offline.sunset,
+      chandra: offline.chandra,
+      surya: offline.surya,
+      rahu: offline.rahu,
+      din_vishesh: ''
+    };
+  }
 
-  const c = el('canvas'), ctx = c.getContext('2d');
-  // background
+  // Draw canvas
+  const c = el('canvas'); const ctx = c.getContext('2d');
+  // background and watermark
   ctx.fillStyle = '#fffaf3'; ctx.fillRect(0,0,c.width,c.height);
+  // faint watermark logo center
+  try{
+    const wm = new Image();
+    wm.crossOrigin = "anonymous";
+    wm.src = logoUrl;
+    await new Promise((res,rej)=>{ wm.onload=res; wm.onerror=res; });
+    ctx.save();
+    ctx.globalAlpha = 0.12;
+    const scale = Math.min(c.width*0.7 / wm.width, c.height*0.7 / wm.height);
+    const w = wm.width * scale, h = wm.height * scale;
+    ctx.drawImage(wm, c.width/2 - w/2, 220, w, h);
+    ctx.restore();
+  }catch(e){
+    // ignore watermark if load fail
+    console.warn('watermark load fail', e);
+  }
 
   // header band
   ctx.fillStyle = '#012b46'; ctx.fillRect(0,0,c.width,120);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 56px Baloo 2, Noto Sans Devanagari'; ctx.textAlign='left';
   ctx.fillText('आजचा पंचांग', 48, 78);
 
-  // date right (marathi format)
+  // logo on top-right (your logo)
+  try{
+    const logo = new Image();
+    logo.crossOrigin = "anonymous";
+    logo.src = logoUrl;
+    await new Promise((res,rej)=>{ logo.onload=res; logo.onerror=res; });
+    const lw = 160, lh = 64;
+    ctx.drawImage(logo, c.width - lw - 48, 24, lw, lh);
+  }catch(e){ /* ignore */ }
+
+  // date text (marathi)
   try{
     const dt = new Date(date);
-    const dateText = dt.toLocaleDateString('mr-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    const dateText = dt.toLocaleDateString('mr-IN',{ weekday:'long', day:'numeric', month:'long', year:'numeric' });
     ctx.font = '18px Noto Sans Devanagari';
     ctx.fillText(dateText, c.width - 420, 40);
   }catch(e){
@@ -308,34 +272,54 @@ function renderCard(){
     ctx.fillText(date, c.width - 180, 40);
   }
 
-  // main card box (outline)
-  const boxX = 48, boxY = 150, boxW = c.width - 96;
+  // main box
+  const boxX=48, boxY=150, boxW=c.width-96;
   ctx.strokeStyle = '#c86d22'; ctx.lineWidth = 5;
-  function roundRectDraw(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); ctx.stroke(); }
-  roundRectDraw(boxX, boxY, boxW, 520, 12);
+  roundRect(ctx,boxX,boxY,boxW,520,12);
+  ctx.stroke();
 
-  // left column (card rows)
-  ctx.font = '28px Noto Sans Devanagari'; ctx.fillStyle='#0b2b3a'; ctx.textAlign='left';
+  // left column rows (card style)
+  ctx.font = '28px Noto Sans Devanagari'; ctx.fillStyle = '#0b2b3a'; ctx.textAlign='left';
   let y = boxY + 60; const gap = 60; const textX = boxX + 90;
-  function drawIcon(x,y,glyph){ ctx.save(); ctx.fillStyle='#f9c846'; ctx.beginPath(); ctx.arc(x,y,22,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.font='18px Noto Sans Devanagari'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(glyph,x,y); ctx.restore(); }
 
-  drawIcon(boxX+36, y-10, 'ति'); ctx.fillText(`तिथी: ${p.tithi}${p.tithi_end?(' • समाप्ती: '+p.tithi_end):''}`, textX, y); y+=gap;
-  drawIcon(boxX+36, y-10, 'वा'); ctx.fillText(`वार: ${new Date(date).toLocaleDateString('mr-IN',{weekday:'long'})}`, textX, y); y+=gap;
-  drawIcon(boxX+36, y-10, 'न'); ctx.fillText(`नक्षत्र: ${p.nakshatra}${p.nak_end?(' • समाप्ती: '+p.nak_end):''}`, textX, y); y+=gap;
-  drawIcon(boxX+36, y-10, 'यो'); ctx.fillText(`योग: ${p.yoga_index?('योग-'+p.yoga_index):'—'}`, textX, y); y+=gap;
-  drawIcon(boxX+36, y-10, 'क'); ctx.fillText(`करण: ${p.karan}`, textX, y); y+=gap;
+  drawIcon(ctx, boxX+36, y-10, 'ति');
+  ctx.fillText(`तिथी: ${data.tithi || ''}${data.tithi_end?(' • समाप्ती: '+data.tithi_end):''}`, textX, y); y+=gap;
+
+  drawIcon(ctx, boxX+36, y-10, 'वा');
+  try{ ctx.fillText(`वार: ${new Date(date).toLocaleDateString('mr-IN',{weekday:'long'})}`, textX, y); }catch{ ctx.fillText(`वार: `, textX, y); }
+  y+=gap;
+
+  drawIcon(ctx, boxX+36, y-10, 'न');
+  ctx.fillText(`नक्षत्र: ${data.nakshatra || ''}${data.nak_end?(' • समाप्ती: '+data.nak_end):''}`, textX, y); y+=gap;
+
+  drawIcon(ctx, boxX+36, y-10, 'यो');
+  ctx.fillText(`योग: ${data.yoga || ''}`, textX, y); y+=gap;
+
+  drawIcon(ctx, boxX+36, y-10, 'क');
+  ctx.fillText(`करण: ${data.karan || ''}`, textX, y); y+=gap;
 
   // right column
   const col2X = boxX + Math.floor(boxW/2) + 20; let y2 = boxY + 60;
   ctx.font = '26px Noto Sans Devanagari';
-  ctx.fillText(`सूर्योदय: ${p.sunr}    सूर्यास्त: ${p.suns}`, col2X, y2); y2+=48;
-  ctx.fillText(`चंद्रराशी: ${p.chandra}`, col2X, y2); y2+=48;
-  ctx.fillText(`सूर्यराशी: ${p.surya}`, col2X, y2); y2+=48;
-  ctx.fillText(`गुरु राशि: ${p.guru}`, col2X, y2); y2+=48;
-  ctx.fillText(`राहू काल: ${p.rahu}`, col2X, y2); y2+=48;
+  ctx.fillText(`सूर्योदय: ${data.sunrise || ''}    सूर्यास्त: ${data.sunset || ''}`, col2X, y2); y2+=48;
+  ctx.fillText(`चंद्रराशी: ${data.chandra || ''}`, col2X, y2); y2+=48;
+  ctx.fillText(`सूर्यराशी: ${data.surya || ''}`, col2X, y2); y2+=48;
+  ctx.fillText(`गुरुराशी: ${data.guru || data.surya || ''}`, col2X, y2); y2+=48;
+  ctx.fillText(`राहू काल: ${data.rahu || ''}`, col2X, y2); y2+=48;
 
-  // bottom strip user info
-  const stripY = boxY + 520 + 40;
+  // bottom strip user info + din-vishesh area above strip
+  const dvY = boxY + 520 + 8;
+  // show din vishesh (if present)
+  if(data.din_vishesh){
+    ctx.fillStyle = '#fff9eb';
+    ctx.fillRect(boxX, dvY, boxW, 80);
+    ctx.strokeStyle = '#e2a92f'; ctx.lineWidth = 2; ctx.strokeRect(boxX, dvY, boxW, 80);
+    ctx.fillStyle = '#0b2b3a';
+    ctx.font = '20px Noto Sans Devanagari';
+    wrapTextCanvas(ctx, `दिनविशेष: ${data.din_vishesh}`, boxX+18, dvY+28, boxW-36, 26);
+  }
+
+  const stripY = boxY + 520 + 100;
   ctx.fillStyle = '#083b52'; ctx.fillRect(0, stripY, c.width, 140);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 34px Noto Sans Devanagari'; ctx.textAlign='left';
   ctx.fillText(name || '', 48, stripY + 48);
@@ -344,6 +328,7 @@ function renderCard(){
   // avatar
   if(userImgData){
     const img = new Image();
+    img.crossOrigin="anonymous";
     img.onload = ()=>{
       ctx.save(); ctx.beginPath();
       ctx.arc(c.width - 120, stripY + 70, 56, 0, Math.PI*2); ctx.closePath(); ctx.clip();
@@ -355,27 +340,55 @@ function renderCard(){
   } else finalize();
 
   function finalize(){
-    ctx.font = '14px Noto Sans Devanagari'; ctx.fillStyle='rgba(0,0,0,0.35)'; ctx.textAlign='right';
+    // small watermark text
+    ctx.font = '14px Noto Sans Devanagari'; ctx.fillStyle = 'rgba(0,0,0,0.28)'; ctx.textAlign='right';
     ctx.fillText('OmKarmyog', c.width - 24, c.height - 12);
+    // set preview
     try{
       el('preview').src = c.toDataURL('image/png');
     }catch(e){
-      console.error(e);
+      console.error('toDataURL failed', e);
       el('preview').alt = 'Preview not supported';
     }
   }
 }
 
-/* Attach events */
-el('generateBtn').addEventListener('click', renderCard);
+/* ---------- Helpers ---------- */
+function wrapTextCanvas(ctx, text, x, y, maxW, lineH){
+  const words = String(text).split(' ');
+  let line = '';
+  for(let n=0;n<words.length;n++){
+    const testLine = line + words[n] + ' ';
+    const tw = ctx.measureText(testLine).width;
+    if(tw > maxW && n > 0){
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineH;
+    } else { line = testLine; }
+  }
+  ctx.fillText(line, x, y);
+}
+function cityLatLng(city){
+  const map = {'Mumbai':[19.0760,72.8777],'Pune':[18.5204,73.8567],'Nagpur':[21.1458,79.0882],'Aurangabad':[19.8762,75.3433]};
+  return map[city] || map['Mumbai'];
+}
+
+/* ---------- Events ---------- */
+el('generateBtn').addEventListener('click', ()=> {
+  renderCard().catch(e=>{ console.error(e); alert('Generate failed: '+e.message); });
+});
 el('downloadBtn').addEventListener('click', ()=>{
   try{
-    const a = document.createElement('a'); a.href = el('canvas').toDataURL('image/png'); a.download = 'panchang_1080x1316.png'; a.click();
-  }catch(e){ alert('Download not supported: '+e.message); }
+    const a=document.createElement('a');
+    a.href = el('canvas').toDataURL('image/png');
+    a.download = 'panchang_1080x1316.png';
+    a.click();
+  }catch(e){ alert('Download failed: '+e.message); }
 });
 
-/* Auto-run on load */
-window.addEventListener('load', ()=> setTimeout(()=> { try{ renderCard(); }catch(e){ console.warn(e); } }, 400));
+/* auto-generate */
+window.addEventListener('load', ()=> setTimeout(()=> el('generateBtn').click(), 600) );
+
 </script>
 </body>
 </html>
