@@ -3,184 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Om Karmyog</title>
+<title>Om Karmyog – Feedback</title>
 
 <style>
     body {
         font-family: "Poppins", sans-serif;
-        background: #f7f7f7;
+        background: #f4f4f4;
         margin: 0;
-        padding: 20px;
+        padding: 12px;
     }
-    .tab-btn {
-        padding: 10px 22px;
-        border-radius: 10px;
-        border: none;
-        background: #ddd;
-        margin: 5px;
-        font-size: 15px;
-        cursor: pointer;
-    }
-    .tab-btn.active {
-        background: #e7c000;
-        color: #000;
-        font-weight: 600;
-    }
+
     .form-section {
         background: #fff;
-        padding: 20px;
-        border-radius: 15px;
-        margin-top: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        padding: 18px;
+        border-radius: 14px;
+        max-width: 420px;
+        margin: auto;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.12);
     }
+
     .form-title {
         text-align: center;
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 700;
-        margin-bottom: 20px;
+        margin-bottom: 6px;
     }
+
+    .form-subtitle {
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 18px;
+    }
+
     label {
         font-weight: 600;
-        margin-top: 10px;
+        margin-top: 12px;
         display: block;
+        font-size: 14px;
     }
-    input, textarea {
+
+    input, textarea, select {
         width: 100%;
         padding: 12px;
-        margin-top: 7px;
-        border-radius: 8px;
+        margin-top: 6px;
+        border-radius: 10px;
         border: 1px solid #ccc;
-        font-size: 15px;
+        font-size: 14px;
         background: #fafafa;
+        box-sizing: border-box;
     }
+
+    textarea {
+        resize: none;
+    }
+
     .submit-btn {
         width: 100%;
-        padding: 12px;
+        padding: 13px;
         background: #e7c000;
         border: none;
         margin-top: 20px;
-        border-radius: 10px;
-        font-size: 18px;
+        border-radius: 12px;
+        font-size: 16px;
         font-weight: 700;
         cursor: pointer;
     }
-    .submit-btn:hover {
-        background: #d4ae00;
+
+    .submit-btn:active {
+        transform: scale(0.98);
     }
 </style>
-
 </head>
+
 <body>
 
-<!-- SIDE BY SIDE BUTTONS LIKE 2nd IMAGE -->
-<div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
-    
-    <button id="bookingBtn" class="tab-btn active" 
-        style="flex:1; max-width:200px;">
-        Book Pandit Ji
-    </button>
+<div class="form-section">
+    <h2 class="form-title">App Feedback</h2>
+    <p class="form-subtitle">Help us improve Om Karmyog App 🙏</p>
 
-    <button id="registerBtn" class="tab-btn" 
-        style="flex:1; max-width:200px;">
-        Register as Pandit Ji
-    </button>
+    <form action="https://formspree.io/f/mldarogw" method="POST">
 
-  </div>
-  
+        <label>Your Name (Optional)</label>
+        <input type="text" name="User Name" placeholder="Your name">
 
-<!-- BOOKING FORM -->
-<div id="bookingForm" class="form-section">
-    <h2 class="form-title">Book Pandit Ji</h2>
+        <label>How was your overall experience?</label>
+        <select name="Overall Experience" required>
+            <option value="">Select</option>
+            <option>Excellent ⭐⭐⭐⭐⭐</option>
+            <option>Good ⭐⭐⭐⭐</option>
+            <option>Average ⭐⭐⭐</option>
+            <option>Poor ⭐⭐</option>
+            <option>Very Poor ⭐</option>
+        </select>
 
-    <form id="userBookingForm" action="https://formspree.io/f/mldarogw" method="POST">
-        <label>Your Full Name</label>
-        <input type="text" name="Full Name" required>
+        <label>Which feature do you like the most?</label>
+        <input type="text" name="Liked Feature" placeholder="Panchang, Bhajan, Gurucharitra">
 
-        <label>Phone / WhatsApp Number</label>
-        <input type="text" name="Phone" required>
+        <label>Any problem or issue you faced?</label>
+        <textarea name="Issue" rows="3" placeholder="Describe the issue (if any)"></textarea>
 
-        <label>Email (optional)</label>
-        <input type="email" name="Email">
+        <label>Your Suggestions / Feedback</label>
+        <textarea name="Suggestions" rows="4" required placeholder="Please share your feedback"></textarea>
 
-        <label>Location</label>
-        <input type="text" name="Location" placeholder="City, Area" required>
-
-      <label>Full Address Details</label>
-<input type="text" name="Location" placeholder="House No.,Nearby....etc" required>
-           
-        <label>Purpose</label>
-        <input type="text" name="Purpose" placeholder="Describe your purpose" required>
-
-        <label>Date of Puja</label>
-        <input type="date" name="Puja Date" required>
-
-        <button type="submit" class="submit-btn">Submit</button>
+        <button type="submit" class="submit-btn">Submit Feedback</button>
     </form>
 </div>
-
-<!-- REGISTRATION FORM -->
-<div id="registrationForm" class="form-section" style="display:none;">
-    <h2 class="form-title">Register as Pandit Ji</h2>
-
-    <form id="panditRegistrationForm" action="https://formspree.io/f/mdkyapdj" method="POST">
-        <label>Pandit Ji Full Name</label>
-        <input type="text" name="Pandit Name" required>
-
-        <label>Phone / WhatsApp Number</label>
-        <input type="text" name="Phone" required>
-
-        <label>Email (optional)</label>
-        <input type="email" name="Email">
-
-        <label>Work Location</label>
-        <input type="text" name="Location" placeholder="Your City / Working Area" required>
-
-        <label>Experience (Years)</label>
-        <input type="text" name="Experience" placeholder="e.g., 10 years of experience">
-
-        <label>Vedic Qualification</label>
-        <input type="text" name="Qualification" placeholder="e.g., Adhyayan, Karmakand, etc.">
-
-        <label>Specialization / Expertise</label>
-        <input type="text" name="Specialization" placeholder="e.g., Astrology, Vastu, Kundali">
-
-        <label>Short Bio</label>
-        <textarea name="Bio" rows="3"></textarea>
-
-
-        <button type="submit" class="submit-btn">Submit</button>
-    </form>
-</div>
-
-<script>
-// Switching Between Forms
-document.getElementById("bookingBtn").addEventListener("click", function () {
-    document.getElementById("bookingForm").style.display = "block";
-    document.getElementById("registrationForm").style.display = "none";
-    this.classList.add("active");
-    document.getElementById("registerBtn").classList.remove("active");
-});
-
-document.getElementById("registerBtn").addEventListener("click", function () {
-    document.getElementById("bookingForm").style.display = "none";
-    document.getElementById("registrationForm").style.display = "block";
-    this.classList.add("active");
-    document.getElementById("bookingBtn").classList.remove("active");
-});
-
-// Double Confirmation Popup
-document.querySelectorAll("form").forEach(form => {
-    form.addEventListener("submit", function(e){
-        e.preventDefault();
-        if(confirm("Are you sure you want to submit?")){
-            if(confirm("Please confirm again")){
-                alert("Form submitted successfully!");
-                form.submit();
-            }
-        }
-    });
-});
-</script>
 
 </body>
 </html>
